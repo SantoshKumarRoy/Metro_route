@@ -14,43 +14,7 @@ vector< pair<ll,ll> > v[100010];//Adjacency List
 ll N;// N is no of vertices M is edges
 string station[400];
 map <string,string> tourm;
-void recharge()
-{
-	fstream f;
-	ll amt,ini,cid,fin,x;
-	ll c_id,amount;
-	f.open("paisa.txt",ios::in|ios::out);
-	if(!f)
-		cout<<"Not Found\n"<<endl;
-	f.seekg(0);
-	cout<<endl;
-	cout<<"Enter Card Id\n";
-	cin>>c_id;
-	cout<<"Enter Amount\n";
-	cin>>amount;
-	f.clear();
-	while(!f.eof())
-	{
-		ini=f.tellg();
-		f.ignore();
-		f>>cid;
-		f>>amt;
-		fin=f.tellg();
-		if(cid==c_id)
-		{
-			x=amt+amount;
-			f.seekg(ini);
-			f<<endl<<cid<<endl<<x;
-			cout<<"Recharge Details\n";
-			cout<<"\nCard Id: "<<cid<<endl;
-			cout<<"Initial Balance: "<<amt<<endl;
-			cout<<"Recharge Amount: "<<amount<<endl;
-			cout<<"Total Balance: "<<x<<endl;
-			break;
-		}
-	}
-	f.close();
-}
+
 void gettour()
 {
 	ifstream fin;
@@ -69,7 +33,7 @@ void gettour()
 	fin.close();
 }
 //Given below code will print the path
-void disp(ll src,ll dest,ll par[])
+void disp(ll src,ll dest,vector<ll> par)
 {
 	ll i,x,y,cn=0,ci=0;
 	stack<ll> st;
@@ -118,10 +82,9 @@ void disp(ll src,ll dest,ll par[])
 	cout<<endl;
 }
 //To find shotest path
-void bfs(ll src,ll dest) 
+void bfs(ll src,ll dest,vector<ll> &par) 
 {
 	bool vis[100010]={false};
-	ll par[100010];
 	for(ll i=0;i<N;i++)
 		par[i]=-1;
 	queue<ll> q;
@@ -144,13 +107,13 @@ void bfs(ll src,ll dest)
 		}
 		v[x].clear();
 	}
-	disp(src,dest,par);
+
 }
 //To find most economical path
-void dijkstra(ll src,ll dest)
+void dijkstra(ll src,ll dest,vector<ll> &par)
 {
 	bool vis[100010]={false};
-	ll dist[100010], par[100010];
+	ll dist[100010];
 	for(ll i=0;i<N;i++)
 	{
 		dist[i]=LLONG_MAX;
@@ -182,9 +145,8 @@ void dijkstra(ll src,ll dest)
 				pq.push(make_pair(y,dist[y]));
 			}
 		}
-		v[x].clear();
+		//v[x].clear();
 	}
-	disp(src,dest,par);
 }
 void consmap()//To assign values to metro stations
 {
@@ -204,8 +166,6 @@ void consmap()//To assign values to metro stations
 	N=l-1;
 	fin.close();
 	map<string,ll> ::iterator it;
-	//for(it=M.begin();it!=M.end();it++)
-	//	cout<<it->se<<" "<<it->fi<<endl;
 }
 void addedge(char fname[],ll w)//To add edges
 {
@@ -254,7 +214,8 @@ int main()
 		cout<<endl;
 		cout<<"1.To Route between two stations\n";
 		cout<<"2.To check nearest metro station to a tourist place\n";
-		cout<<"3.To Recharge your Smart Card\n";
+		cout<<"3.For customize your route by giving the intermediate station through which you want to reach your destination station \n";
+
 		cout<<" Enter Your Choice =  ";
 		cin>>dec;
 		switch(dec)
@@ -273,16 +234,16 @@ int main()
 						cout<<"1.For most economic path\n";
 						cout<<"2.For shortest path";
 						cin>>choice;
-						cout<<"\n c= \n";
+						vector<ll> par(100010,-1);
 						switch(choice)
 						{
 							
-							case 1:dijkstra(src,dest);
-							
+							case 1:dijkstra(src,dest,par);
 									break;
-							case 2:bfs(src,dest);
+							case 2:bfs(src,dest,par);
 									break;
 						}
+						disp(src,dest,par);
 						cout<<"Do you wish to check for any other station\n";
 						cin>>ch;
 					}while(ch=='Y'||ch=='y');	
@@ -304,8 +265,35 @@ int main()
 			case 3:
 					do
 					{
-						recharge();
-						cout<<"Do you wish to recharge some other smart card\n";
+						consgraph();//To build the adjacency matrix
+						cout<<"Enter Starting station\n";
+						getline(cin,source);
+						getline(cin,source);
+						
+						src=M[source];
+						cout<<"Enter Destination station\n";
+						getline(cin,destination);
+						int dest=M[destination];
+						cout<<"Enter no of Intermediate Station btw Staring and destination station\n ";
+						int noOfElement;
+						cin>>noOfElement;
+						vector<ll> par(100010,-1);
+						for(int i=0;i<noOfElement;i++)
+						{
+							cout<<"enter station "<<i+1<<" = ";
+							string stat;
+							getline(cin,stat);
+							getline(cin,stat);
+							int intermediateStation=M[stat];
+							dijkstra(src,intermediateStation,par);
+							cout<<"\n********************ROUTE*******************\n";
+							disp(src,intermediateStation,par);
+							src=intermediateStation;
+							cout<<" \nNow from = ";
+						}
+						dijkstra(src,dest,par);
+						disp(src,dest,par);
+						cout<<"D You want to customize another shortest Route \n";
 						cin>>ch;
 					}while(ch=='Y'||ch=='y');
 					break;
