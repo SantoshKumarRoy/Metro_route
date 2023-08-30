@@ -78,7 +78,7 @@ void disp(ll src,ll dest,vector<ll> par)
 		cout<<endl;
 	}
 	cout<<endl<<"No of stations ="<<cn<<endl;
-	cout<<"No of interchange stations ="<<ci-1<<endl;
+	cout<<"No of interchange METRO ="<<ci-1<<endl;
 	cout<<endl;
 }
 //To find shotest path
@@ -145,7 +145,7 @@ void dijkstra(ll src,ll dest,vector<ll> &par)
 				pq.push(make_pair(y,dist[y]));
 			}
 		}
-		//v[x].clear();
+		
 	}
 }
 void consmap()//To assign values to metro stations
